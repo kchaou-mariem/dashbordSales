@@ -1,0 +1,56 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model List<dashbordSales.Models.SalesQuantityPerMonthModel>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@{
+    ViewData["Title"] = "Quantité Vendue par Mois";
+}
+
+<!-- Ajouter le CSS Bootstrap pour la beauté -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<h2>Quantité Vendue par Mois</h2>
+
+<canvas id="salesQuantityChart" width="300" height="100"></canvas>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    var ctx = document.getElementById('salesQuantityChart').getContext('2d');
+    var salesQuantityChart = new Chart(ctx, {
+        type: 'bar', // 📊 graphique en barres
+        data: {
+            labels: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Select(x => x.Month))),
+            datasets: [{
+                label: 'Quantité Vendue',
+                data: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Select(x => x.TotalSalesQuantity))),
+                backgroundColor: 'rgba(75, 192, 192, 0.5)', // couleur douce
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Quantité'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Mois'
+                    }
+                }
+            }
+        }
+    });
+</script>

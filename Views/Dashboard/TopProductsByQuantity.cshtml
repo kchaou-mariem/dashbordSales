@@ -1,0 +1,55 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model List<dashbordSales.Models.TopProductsModel>
+@using Newtonsoft.Json
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@{
+    ViewData["Title"] = "Top 5 Produits par Quantité Vendue";
+}
+
+<h2>Top 5 Produits par Quantité Vendue</h2>
+
+<canvas id="topProductsChart" style="width: 30%; height: 100px;"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const ctx = document.getElementById('topProductsChart').getContext('2d');
+
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: @Html.Raw(JsonConvert.SerializeObject(Model.Select(x => x.StockItemName))),
+            datasets: [{
+                label: 'Quantité vendue',
+                data: @Html.Raw(JsonConvert.SerializeObject(Model.Select(x => x.TotalQuantitySold))),
+                backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'x',
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Quantité'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Produit'
+                    }
+                }
+            }
+        }
+    });
+</script>

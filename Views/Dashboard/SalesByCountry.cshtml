@@ -1,0 +1,56 @@
+﻿@model List<dashbordSales.Models.SalesByCountryModel>
+@using Newtonsoft.Json
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@{
+    ViewData["Title"] = "Ventes par Pays";
+}
+
+<h2>Répartition du Chiffre d'Affaires par Pays</h2>
+
+<div style="margin-bottom: 30px;">
+    <canvas id="salesByCountryChart" width="600" height="400" style="display: block; margin: 0 auto; max-width: 100%; height: auto;"></canvas>
+</div>
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const ctx = document.getElementById('salesByCountryChart').getContext('2d');
+
+    const chart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: @Html.Raw(JsonConvert.SerializeObject(Model.Select(x => x.CountryName))),
+            datasets: [{
+                label: 'Chiffre d\'Affaires',
+                data: @Html.Raw(JsonConvert.SerializeObject(Model.Select(x => x.TotalSalesRevenue))),
+                backgroundColor: [
+                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                    '#F7464A', '#46BFBD', '#FDB45C', '#949FB1', '#4D5360'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            let value = context.raw;
+                            return `${context.label}: ${value.toLocaleString()} €`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+

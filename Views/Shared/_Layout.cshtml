@@ -1,0 +1,131 @@
+﻿@{
+}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Dashboard</title>
+
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+    <style>
+        body {
+            display: flex;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f1f3f5;
+        }
+
+        .sidebar {
+            width: 260px;
+            background-color: #fff;
+            border-right: 1px solid #dee2e6;
+            flex-shrink: 0;
+            padding: 2rem 1rem;
+            transition: all 0.3s ease-in-out;
+        }
+
+            .sidebar .navbar-brand {
+                font-weight: bold;
+                color: #212529 !important;
+                font-size: 1.3rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .sidebar .nav-link {
+                color: #495057;
+                padding: 0.75rem 1rem;
+                border-radius: 0.5rem;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                font-weight: 500;
+            }
+
+                .sidebar .nav-link:hover {
+                    background-color: #f1f3f5;
+                    color: #0d6efd;
+                }
+
+                .sidebar .nav-link.active {
+                    background-color: #e9ecef;
+                    color: #0d6efd;
+                    font-weight: 600;
+                }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 2rem;
+        }
+
+        .menu-toggle {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1100;
+        }
+
+       
+
+        .sidebar.show {
+            left: 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-content {
+            padding: 1rem;
+        }
+
+        }
+    </style>
+</head>
+<body>
+    <!-- Toggle button for mobile -->
+    <button class="btn btn-outline-secondary d-md-none menu-toggle" onclick="toggleSidebar()">☰</button>
+
+    <!-- Sidebar -->
+    <div class="sidebar d-flex flex-column" id="sidebar">
+        <a class="navbar-brand" href="/"><i class="bi bi-house-door-fill me-2"></i>Dashboard</a>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="/Dashboard/SalesPerMonth"><i class="bi bi-calendar3"></i> Monthly Sales</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/Dashboard/SalesQuantityPerMonth"><i class="bi bi-bar-chart"></i> Quantity Sold</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/Dashboard/TopCustomersBySales"><i class="bi bi-people"></i> Top Clients</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/Dashboard/TopProductsByQuantity"><i class="bi bi-box-seam"></i> Top Products</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/Dashboard/SalesByCountry"><i class="bi bi-globe"></i> Sales by Country</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/Dashboard/SalesBySalesperson"><i class="bi bi-person-badge"></i> By Salesperson</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/Dashboard/SalesByProductCategory"><i class="bi bi-tags"></i> By Category</a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main content -->
+    <div class="main-content">
+        @RenderBody()
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleSidebar() {
+            document.getElementById("sidebar").classList.toggle("show");
+        }
+    </script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

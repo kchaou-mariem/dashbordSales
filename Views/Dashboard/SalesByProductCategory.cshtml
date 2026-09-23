@@ -1,0 +1,52 @@
+﻿@model List<dashbordSales.Models.SalesByProductCategoryModel>
+@using Newtonsoft.Json
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@{
+    ViewData["Title"] = "Ventes par Catégorie de Produit";
+}
+
+<h2>Ventes par Catégorie de Produit</h2>
+
+<div style="max-width: 600px; margin: auto;">
+    <canvas id="salesByProductCategoryChart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const ctx = document.getElementById('salesByProductCategoryChart').getContext('2d');
+
+    const chart = new Chart(ctx, {
+        type: 'pie', // ✅ ICI on change le type du graphe
+        data: {
+            labels: @Html.Raw(JsonConvert.SerializeObject(Model.Select(x => x.ProductCategory))),
+            datasets: [{
+                label: 'Chiffre d\'Affaires',
+                data: @Html.Raw(JsonConvert.SerializeObject(Model.Select(x => x.TotalSalesRevenue))),
+                backgroundColor: [
+                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                    '#9966FF', '#F7464A', '#46BFBD', '#FDB45C',
+                    '#949FB1', '#4D5360'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return `${context.label}: ${context.raw.toLocaleString()} €`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>

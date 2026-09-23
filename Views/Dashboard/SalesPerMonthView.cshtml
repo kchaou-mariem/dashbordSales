@@ -1,0 +1,56 @@
+﻿@model List<dashbordSales.Models.SalesPerMonthModel>
+@using Newtonsoft.Json
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Ventes par mois";
+}
+
+<h2 style="text-align: left;">Ventes par mois</h2>
+
+<div style="max-width: 800px; margin: auto;">
+    <canvas id="salesChart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    var ctx = document.getElementById('salesChart').getContext('2d');
+    var salesChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: @Html.Raw(JsonConvert.SerializeObject(Model.Select(m => m.Month))),
+            datasets: [{
+                label: 'Total Sales',
+                data: @Html.Raw(JsonConvert.SerializeObject(Model.Select(m => m.TotalSales))),
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 2,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    beginAtZero: true
+                },
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+
+@* <select id="monthFilter" onchange="filterData()">
+    <option value="all">All</option>
+    <option value="January">January</option>
+    <option value="February">February</option>
+    <!-- Ajouter d'autres mois ici -->
+</select>
+
+<script>
+    function filterData() {
+        var selectedMonth = document.getElementById('monthFilter').value;
+        // Logique pour filtrer les données et mettre à jour le graphique
+    }
+</script> *@

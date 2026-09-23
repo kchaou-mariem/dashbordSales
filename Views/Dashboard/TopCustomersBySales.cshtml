@@ -1,0 +1,57 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model List<dashbordSales.Models.TopCustomersModel>
+@using Newtonsoft.Json
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@{
+    ViewData["Title"] = "Top 5 Clients";
+}
+
+<h2>Top 5 Clients</h2>
+
+<div style="margin-top: 30px; text-align: center;">
+    <canvas id="topCustomersChart" style="width: 90%; height: 200px;"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const ctx = document.getElementById('topCustomersChart').getContext('2d');
+
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: @Html.Raw(JsonConvert.SerializeObject(Model.Select(x => x.CustomerName))),
+            datasets: [{
+                label: 'Chiffre d\'Affaires',
+                data: @Html.Raw(JsonConvert.SerializeObject(Model.Select(x => x.TotalSales))),
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y', // ➜ barres horizontales
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Total des ventes'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Client'
+                    }
+                }
+            }
+        }
+    });
+</script>

@@ -1,0 +1,234 @@
+﻿@model dashbordSales.Models.DashboardViewModel
+@{
+    ViewData["Title"] = "Sales Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    .card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        padding: 1rem;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 350px;
+    }
+
+    h2.title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #0d6efd;
+    }
+
+    .chart-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+</style>
+
+<div class="container my-5">
+    <h2 class="text-center title mb-5">Sales Dashboard Overview</h2>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-2 g-4">
+        <div class="col">
+            <div class="card">
+                <h5 class="chart-title text-center">Monthly Sales</h5>
+                <div class="chart-container">
+                    <canvas id="salesPerMonthChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card">
+                <h5 class="chart-title text-center">Quantity Sold per Month</h5>
+                <div class="chart-container">
+                    <canvas id="quantityPerMonthChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card">
+                <h5 class="chart-title text-center">Top Customers</h5>
+                <div class="chart-container">
+                    <canvas id="topCustomersChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card">
+                <h5 class="chart-title text-center">Sales by Country</h5>
+                <div class="chart-container">
+                    <canvas id="salesByCountryChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card">
+                <h5 class="chart-title text-center">Top Products</h5>
+                <div class="chart-container">
+                    <canvas id="topProductsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card">
+                <h5 class="chart-title text-center">Sales by Salesperson</h5>
+                <div class="chart-container">
+                    <canvas id="salesBySalespersonChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="card">
+                <h5 class="chart-title text-center">Sales by Product Category</h5>
+                <div class="chart-container">
+                    <canvas id="salesByCategoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+    <script>
+        const labelsSales = @Html.Raw(Json.Serialize(Model.SalesPerMonth.Select(x => x.Month)));
+        const dataSales = @Html.Raw(Json.Serialize(Model.SalesPerMonth.Select(x => x.TotalSales)));
+
+        const quantityLabels = @Html.Raw(Json.Serialize(Model.SalesQuantityPerMonth.Select(x => x.Month)));
+        const quantityData = @Html.Raw(Json.Serialize(Model.SalesQuantityPerMonth.Select(x => x.TotalSalesQuantity)));
+
+        const customerLabels = @Html.Raw(Json.Serialize(Model.TopCustomersBySales.Select(x => x.CustomerName)));
+        const customerData = @Html.Raw(Json.Serialize(Model.TopCustomersBySales.Select(x => x.TotalSales)));
+
+        const productLabels = @Html.Raw(Json.Serialize(Model.TopProductsByQuantity.Select(x => x.StockItemName)));
+        const productData = @Html.Raw(Json.Serialize(Model.TopProductsByQuantity.Select(x => x.TotalQuantitySold)));
+
+        const countryLabels = @Html.Raw(Json.Serialize(Model.SalesByCountry.Select(x => x.CountryName)));
+        const countryData = @Html.Raw(Json.Serialize(Model.SalesByCountry.Select(x => x.TotalSalesRevenue)));
+
+        const salespersonLabels = @Html.Raw(Json.Serialize(Model.SalesBySalesperson.Select(x => x.SalespersonName)));
+        const salespersonData = @Html.Raw(Json.Serialize(Model.SalesBySalesperson.Select(x => x.TotalSalesRevenue)));
+
+        const categoryLabels = @Html.Raw(Json.Serialize(Model.SalesByProductCategory.Select(x => x.ProductCategory)));
+        const categoryData = @Html.Raw(Json.Serialize(Model.SalesByProductCategory.Select(x => x.TotalSalesRevenue)));
+
+            function renderChart(id, type, labels, data, label, orientation = 'x', numericOnly = false, showLabels = true) {
+            const isCircular = ['pie', 'doughnut', 'polarArea'].includes(type);
+            const isRadar = type === 'radar';
+
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: orientation === 'y' ? 'y' : 'x',
+                layout: {
+                    padding: 20
+                },
+                plugins: {
+                    legend: {
+                        display: label !== ''
+                    },
+                    datalabels: {
+                        display: showLabels,
+                        color: '#000',
+                        anchor: isCircular ? 'end' : 'center',
+                        align: isCircular ? 'end' : 'center',
+                        clamp: true,
+                        font: {
+                            size: 11
+                        },
+                        formatter: function (value, context) {
+                            return numericOnly ? value : `${context.chart.data.labels[context.dataIndex]}: ${value}`;
+                        }
+                    },
+                    tooltip: {
+                        enabled: true
+                    }
+                },
+                scales: (type === 'bar' || type === 'line') ? {
+                    x: {
+                        ticks: {
+                            autoSkip: false,
+                            font: {
+                                size: 11
+                            }
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            font: {
+                                size: 11
+                            }
+                        }
+                    }
+                } : (isRadar ? {
+                    r: {
+                        pointLabels: {
+                            font: {
+                                size: 11
+                            }
+                        }
+                    }
+                } : {})
+            };
+
+            const chartData = {
+                labels: labels,
+                datasets: [{
+                    label: label,
+                    data: data,
+                    backgroundColor: [
+                        '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e',
+                        '#e74a3b', '#858796', '#fd7e14', '#20c997',
+                        '#6f42c1', '#0dcaf0', '#198754', '#343a40',
+                        '#ff6384', '#36a2eb', '#cc65fe', '#ffce56'
+                    ],
+                    borderColor: type === 'line' ? '#4e73df' : '#fff',
+                    borderWidth: 2,
+                    fill: type === 'line' ? false : true,
+                    tension: 0.3,
+                    pointRadius: 5,
+                    pointHoverRadius: 7
+                }]
+            };
+
+            const canvas = document.getElementById(id);
+            if (canvas.chartInstance) {
+                canvas.chartInstance.destroy();
+            }
+
+            const chartInstance = new Chart(canvas, {
+                type: type,
+                data: chartData,
+                options: chartOptions,
+                plugins: [ChartDataLabels]
+            });
+
+            canvas.chartInstance = chartInstance;
+        }
+
+
+        renderChart('salesPerMonthChart', 'line', labelsSales, dataSales, 'Monthly Sales (€)', 'x', false, false);
+        renderChart('quantityPerMonthChart', 'bar', quantityLabels, quantityData, 'Quantity Sold', 'x', false, false);
+        renderChart('salesBySalespersonChart', 'bar', salespersonLabels, salespersonData, 'Sales by Salesperson', 'y', false, true);
+        renderChart('salesByCategoryChart', 'pie', categoryLabels, categoryData, 'Sales by Category', 'x', false, false);
+        renderChart('topCustomersChart', 'bar', customerLabels, customerData, '', 'x', true);
+        renderChart('topProductsChart', 'bar', productLabels, productData, '', 'x', true);
+        renderChart('salesByCountryChart', 'doughnut', countryLabels, countryData, 'Sales by Country');
+
+
+    </script>
+}
